@@ -10,7 +10,6 @@ async function getUserLikes(userId) {
 async function deleteAllVacationLikes(vacationId) {
     let sql = "DELETE FROM `vacations`.`likes` WHERE (`vacation_id` = ?)";
     let parameters = [vacationId];
-    console.log("hello")
     await connection.executeWithParameters(sql, parameters);
 }
 
