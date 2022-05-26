@@ -10,33 +10,30 @@ const saltLeft = "--mnlcfs;@!$ ";
 
 async function addUser(userRegistrationData) {
   validateUserData(userRegistrationData);
-  if (await usersDal.isUserNameExist(userRegistrationData.email)) {
+  if (await usersDal.isUserNameExist(userRegistrationData.id, userRegistrationData.userName)) {
     throw new Error("User name already exist");
   }
 
   normalizeOptionalData(userRegistrationData);
 
   userRegistrationData.password = hashPassword(userRegistrationData.password);
-  userRegistrationData.userType = "user";
-  let newUser = await usersDal.addUser(userRegistrationData);
-  return newUser;
+  userRegistrationData.role = "user";
+  await usersDal.addUser(userRegistrationData);
+
 }
 
-async function loginUser(user) {
-  user.password = hashPassword(user.password);
-  console.log("Hashed password : " + user.password);
+async function loginUser(userLoginData) {
+  userLoginData.password = hashPassword(userLoginData.password);
+  console.log("Hashed password : " + userLoginData.password);
 
-  let userDetails = await usersDal.loginUser(user)
-  if (!userDetails) {
+  let userData = await usersDal.loginUser(userLoginData)
+  if (!userData) {
     throw new Error("Invalid E-mail or password");
   }
-  let likesArray = await likesLogic.getUserLikes(userDetails.id);
+  const token = jwt.sign({userId: userData.id, role: userData.role}, config.secret);
+  const successfulLogInResponse = { token, firstName: userData.firstName, lastName: userData.lastName, city: userData.city, street: userData.street };
 
-  let userIdAndType = { userId: userDetails.id, userType: userDetails.userType };
-  const token = jwt.sign(userIdAndType, config.secret);
-  const logInResponse = { token: token, firstName: userDetails.firstName, lastName: userDetails.lastName, userLikes: likesArray, userType: userDetails.userType };
-
-  return logInResponse;
+  return successfulLogInResponse;
 }
 
 function hashPassword(password) {
@@ -46,7 +43,7 @@ function hashPassword(password) {
 
 function validateUserData(userRegistrationData) {
   let format = /[^a-zA-Z]/g;
-  if (!userRegistrationData.email) {
+  if (!userRegistrationData.userName) {
     throw new Error("Invalid user name or password");
   }
 
@@ -68,6 +65,22 @@ function validateUserData(userRegistrationData) {
 
   if (format.test(userRegistrationData.lastName)) {
     throw new Error("Last Name must contain only Letters")
+  }
+
+  if (!userRegistrationData.lastName || userRegistrationData.lastName.length < 3) {
+    throw new Error("Please enter last name . (At least 3 characters)")
+  }
+
+  if (format.test(userRegistrationData.city)) {
+    throw new Error("City must contain only Letters")
+  }
+
+  if (!userRegistrationData.city || userRegistrationData.city.length < 3) {
+    throw new Error("Please enter city . (At least 3 characters)")
+  }
+
+  if (!userRegistrationData.street || userRegistrationData.street.length < 3) {
+    throw new Error("Please enter street . (At least 3 characters)")
   }
 
 }
