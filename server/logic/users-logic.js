@@ -71,10 +71,6 @@ function validateUserData(userRegistrationData) {
     throw new Error("Please enter last name . (At least 3 characters)")
   }
 
-  if (format.test(userRegistrationData.city)) {
-    throw new Error("City must contain only Letters")
-  }
-
   if (!userRegistrationData.city || userRegistrationData.city.length < 3) {
     throw new Error("Please enter city . (At least 3 characters)")
   }
