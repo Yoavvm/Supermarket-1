@@ -1,5 +1,7 @@
 let usersDal = require('../dal/users-dal');
 const crypto = require("crypto");
+const tokenDecoder = require("../utils/token-decoder")
+
 
 const jwt = require('jsonwebtoken');
 const config = require('../config/config.json');
@@ -30,9 +32,13 @@ async function loginUser(userLoginData) {
   if (!userData) {
     throw new Error("Invalid E-mail or password");
   }
-  const token = jwt.sign({userId: userData.id, role: userData.role}, config.secret);
-  const successfulLogInResponse = { token, firstName: userData.firstName, lastName: userData.lastName, city: userData.city, street: userData.street };
-
+  console.log("userData", userData);
+  let tokenInfo = { userId: userData.userId, role: userData.role }
+  console.log("tokenInfo",tokenInfo);
+  const token = jwt.sign(tokenInfo, config.secret);
+  const successfulLogInResponse = { token: token, firstName: userData.firstName, lastName: userData.lastName, city: userData.city, street: userData.street };
+  console.log();
+  
   return successfulLogInResponse;
 }
 

@@ -27,6 +27,31 @@ router.get("/:categoryId", async (request, response) => {
     }
 });
 
+router.get("/search/:searchString", async (request, response) => {
+    try {
+        let products = await productsLogic.searchProduct(request.params.searchString);
+        response.json(products);
+    }
+    catch (e) {
+        console.error(e);
+        response.status(600).send(e.message);
+    }
+});
+
+router.put("/", async (request, response) => {
+    try {
+        let product = request.body;
+        let id = await productsLogic.editProduct(product);
+
+        response.json(id);
+    }
+    catch (e) {
+        console.error(e);
+        response.status(600).send(e.message);
+    }
+});
+
+
 router.post("/", async (request, response) => {
     try {
         let productDetails = request.body;

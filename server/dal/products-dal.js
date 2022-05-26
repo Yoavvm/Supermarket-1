@@ -39,12 +39,28 @@ async function deleteProduct(productId) {
     await connection.executeWithParameters(sql, parameters);
 }
 
+async function searchProduct(searchString) {
+    let sql = `SELECT p.id, p.name, p.price, p.img_url as imgUrl, p.category_id as categoryId, c.name as categoryName 
+    FROM supermarket.products p join supermarket.categories c 
+    on p.category_id = c.id 
+    where p.name like "%${searchString}%"`;
 
+    let products = await connection.execute(sql);
+    return products;
+}
 
+async function editProduct(product) {
+    let sql = `UPDATE products SET name = ?, price = ?, img_url = ?, category_id = ? WHERE id = ?;`;
+    let parameters = [product.name, product.price, product.imgUrl, product.categoryId, product.id];
+
+    await connection.executeWithParameters(sql, parameters);
+}
 
 module.exports = {
     getAllProducts,
     addNewProduct,
     deleteProduct,
-    getAllProductsByCategory
+    getAllProductsByCategory,
+    searchProduct,
+    editProduct
 }
