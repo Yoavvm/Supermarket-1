@@ -1,7 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const app = express();
-// const vacationsController = require('./controllers/vacations-controller');
+const productsController = require('./controllers/products-controller');
 const usersController = require('./controllers/users-controller');
 const categoriesController = require('./controllers/categories-controller');
 const loginFilter = require('./middleware/login-filter');
@@ -15,7 +15,7 @@ app.use(loginFilter());
 app.use(express.json());
 
 // Every http request which starts with /vacations will be dealt inside "vacationsController"
-// app.use("/vacations", vacationsController);
+app.use("/products", productsController);
 app.use("/users", usersController);
 app.use("/categories", categoriesController);
 
